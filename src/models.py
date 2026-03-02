@@ -10,15 +10,14 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(80), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
     favorites: Mapped[List["Favorites"]] = relationship(back_populates="user")
 
     def serialize(self):
         return {
             "id": self.id,
-            "email": self.email,
-            "favorites": [fav.id for fav in self.favorites]
+            "email": self.email
         }
 
 class Favorites(db.Model):
@@ -27,9 +26,9 @@ class Favorites(db.Model):
     
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     
-    personaje_id: Mapped[int] = mapped_column(ForeignKey("personaje.id"), nullable=True)
-    planeta_id: Mapped[int] = mapped_column(ForeignKey("planeta.id"), nullable=True)
-    nave_id: Mapped[int] = mapped_column(ForeignKey("nave.id"), nullable=True)
+    personaje_id: Mapped[int] = mapped_column(ForeignKey("personaje.id"), nullable=False)
+    planeta_id: Mapped[int] = mapped_column(ForeignKey("planeta.id"), nullable=False)
+    nave_id: Mapped[int] = mapped_column(ForeignKey("nave.id"), nullable=False)
 
     user: Mapped["User"] = relationship(back_populates="favorites")
     personaje: Mapped["Personaje"] = relationship(back_populates="favorited")
@@ -51,14 +50,17 @@ class Personaje(db.Model):
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     
     id_planeta: Mapped[int] = mapped_column(ForeignKey("planeta.id"), nullable=False)
-    id_nave: Mapped[int] = mapped_column(ForeignKey("nave.id"), nullable=True)
+    id_nave: Mapped[int] = mapped_column(ForeignKey("nave.id"), nullable=False)
 
     planeta: Mapped["Planeta"] = relationship(back_populates="residentes")
     nave: Mapped["Nave"] = relationship(back_populates="pilotos")
     favorited: Mapped[List["Favorites"]] = relationship(back_populates="personaje")
 
     def serialize(self):
-        return {"id": self.id, "nombre": self.nombre}
+        return {
+                "id": self.id, 
+                "nombre": self.nombre
+                }
 
 class Planeta(db.Model):
     __tablename__ = "planeta"
@@ -70,7 +72,11 @@ class Planeta(db.Model):
     favorited: Mapped[List["Favorites"]] = relationship(back_populates="planeta")
 
     def serialize(self):
-        return {"id": self.id, "nombre": self.nombre, "clima": self.clima}
+        return {
+                "id": self.id, 
+                "nombre": self.nombre, 
+                "clima": self.clima
+                }
 
 class Nave(db.Model):
     __tablename__ = "nave"
@@ -82,4 +88,8 @@ class Nave(db.Model):
     favorited: Mapped[List["Favorites"]] = relationship(back_populates="nave")
 
     def serialize(self):
-        return {"id": self.id, "nombre": self.nombre, "modelo": self.modelo}
+        return {
+                "id": self.id, 
+                "nombre": self.nombre, 
+                "modelo": self.modelo
+                }
