@@ -32,9 +32,9 @@ class Favorites(db.Model):
     nave_id: Mapped[int] = mapped_column(ForeignKey("nave.id"), nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="favorites")
-    personaje: Mapped["Personaje"] = relationship(back_populates="favorited_by")
-    planeta: Mapped["Planeta"] = relationship(back_populates="favorited_by")
-    nave: Mapped["Nave"] = relationship(back_populates="favorited_by")
+    personaje: Mapped["Personaje"] = relationship(back_populates="favorited")
+    planeta: Mapped["Planeta"] = relationship(back_populates="favorited")
+    nave: Mapped["Nave"] = relationship(back_populates="favorited")
 
     def serialize(self):
         return {
@@ -55,7 +55,7 @@ class Personaje(db.Model):
 
     planeta: Mapped["Planeta"] = relationship(back_populates="residentes")
     nave: Mapped["Nave"] = relationship(back_populates="pilotos")
-    favorited_by: Mapped[List["Favorites"]] = relationship(back_populates="personaje")
+    favorited: Mapped[List["Favorites"]] = relationship(back_populates="personaje")
 
     def serialize(self):
         return {"id": self.id, "nombre": self.nombre}
@@ -67,7 +67,7 @@ class Planeta(db.Model):
     clima: Mapped[str] = mapped_column(String(120), nullable=False)
 
     residentes: Mapped[List["Personaje"]] = relationship(back_populates="planeta")
-    favorited_by: Mapped[List["Favorites"]] = relationship(back_populates="planeta")
+    favorited: Mapped[List["Favorites"]] = relationship(back_populates="planeta")
 
     def serialize(self):
         return {"id": self.id, "nombre": self.nombre, "clima": self.clima}
@@ -79,7 +79,7 @@ class Nave(db.Model):
     modelo: Mapped[str] = mapped_column(String(120), nullable=False)
 
     pilotos: Mapped[List["Personaje"]] = relationship(back_populates="nave")
-    favorited_by: Mapped[List["Favorites"]] = relationship(back_populates="nave")
+    favorited: Mapped[List["Favorites"]] = relationship(back_populates="nave")
 
     def serialize(self):
         return {"id": self.id, "nombre": self.nombre, "modelo": self.modelo}
